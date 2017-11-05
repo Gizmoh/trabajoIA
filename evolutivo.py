@@ -3,7 +3,7 @@
 import random
 import sys
 import numpy as np
-import statistics as stats
+import csv
 from py4j.java_gateway import JavaGateway
 from config import DOORS, \
                     SOLUTIONS, \
@@ -60,7 +60,7 @@ class Individuo():
         fitnessList = []
         # Con esta funcion se realizan 30 pruebas distintas por individuo, se almacenan
         # los resultados y se obtiene un promedio que corresponde a la evaluacion del individuo
-        for i in range(0,5):
+        for i in range(0,10):
             bridge.command("load-fixed-plan-file")
             bridge.command("load-fixed-door-file")
             bridge.command("generate-population")
@@ -291,9 +291,6 @@ def cruzeIndividuos(individuos, posiciones, bridge):
     testX = [0,2,4,6,8]
     testY = [1,3,5,7,9]
     alpha = individuos[0]
-    print "alpha ", alpha.genes , alpha.fitness
-    print "beta ", individuos[1].genes, individuos[1].fitness
-    print "gamma ", individuos[2].genes, individuos[2].fitness
     for beta in range(1,len(individuos)):
         for q in testX:
             for w in testX:
@@ -330,41 +327,72 @@ def descarteIndividuos (individuos, porcentaje, genes):
     print len(individuos)
 
 
-def mutarIndividuos(individuos, genes, bridge):
+#def mutarIndividuos(individuos, genes, bridge):
     # Mutar con probabilidad de 0.01 algun gen de un individuo
-    choices = ["M", "N"]
-    weights = [0.01, 0.99]
-    mutados = []
-    for i in individuos:
-        for pos in [0,1,2,3,4]:
-            rnd = np.random.choice(choices, p=weights)
-            if rnd == "M":
-                #pos = random.randrange(0, 5)  # randrange (0, n-1)
-                continua = True
-                while continua:
-                    iguales = 0
-                    gen = genes[random.randrange(0, len(genes))]
-                    for x in range(0, 5):
-                        if gen.x != i.genes[2 * x] and gen.y != i.genes[(2 * x) + 1]:
-                            iguales = iguales
-                        else:
-                            iguales = iguales + 1
+    #choices = ["M", "N"]
+    #weights = [0.01, 0.99]
+    #mutados = []
+    #for i in individuos:
+    #    for pos in [0,1,2,3,4]:
+    #        rnd = np.random.choice(choices, p=weights)
+    #        if rnd == "M":
+    #            #pos = random.randrange(0, 5)  # randrange (0, n-1)
+    #            continua = True
+    #            while continua:
+    #                iguales = 0
+    #                gen = genes[random.randrange(0, len(genes))]
+    #                for x in range(0, 5):
+    #                    if gen.x != i.genes[2 * x] and gen.y != i.genes[(2 * x) + 1]:
+    #                        iguales = iguales
+    #                    else:
+    #                       iguales = iguales + 1
 
-                    if iguales == 0:
-                        continua = False
-                        i.genes[2 * pos] = gen.x
-                        i.genes[2 * pos + 1] = gen.y
-                    else:
-                        continua = True  
-                #Se cambia fitness para la nueva evaluacion
-                i.fitness = 0
-                i.evaluar(bridge)
-            else:
-                pass
-        mutados.append(i)
+    #                if iguales == 0:
+    #                    continua = False
+    #                    i.genes[2 * pos] = gen.x
+    #                    i.genes[2 * pos + 1] = gen.y
+    #                else:
+    #                    continua = True  
+    #            #Se cambia fitness para la nueva evaluacion
+    #            i.fitness = 0
+    #            i.evaluar(bridge)
+    #        else:
+    #            pass
+    #    mutados.append(i)
 
-    mutados = ordenarIndividuos(mutados)
-    return mutados
+    #mutados = ordenarIndividuos(mutados)
+    #return mutados
+
+def Xmen (individuos, posiciones, mutacion):
+    testX = [0,2,4,6,8]
+    testY = [1,3,5,7,9]
+    opcion = ["X","Y"]
+    for x in range(0,mutacion):
+        elige = random.choice(opcion)
+        if elige=="X":
+            W = random.randint(0,len(individuos)-1)
+            temp = individuos[W]
+            Q = random.choice(testX)
+            newX = temp.genes[Q] + random.randint(-2,2)
+            for x in posiciones:
+                if newX == x.x and temp.genes[Q+1] == x.y:
+                    asdufee = x
+                    if asdufee.tipo ==64:
+                        individuos[W].genes[Q] = newX
+        if elige=="Y":
+            W = random.randint(0,len(individuos)-1)
+            temp = individuos[W]
+            Q = random.choice(testY)
+            newY = temp.genes[Q] + random.randint(-2,2)
+            for x in posiciones:
+                if temp.genes[Q-1] == x.x and newY == x.y:
+                    asdufee = x
+                    if asdufee.tipo ==64:
+                        individuos[W].genes[Q] = newY
+        
+
+
+
 
 
 def generarDoors(genes, file=None):
@@ -385,19 +413,27 @@ if __name__ == "__main__":
         numero_pruebas = int(sys.argv[1])
         plan_elegido = PLANARRAY[int(sys.argv[2])]
         porcentajeDescarte = int(sys.argv[3])
+        mutacion = int(sys.argv[4])
         print u"Total de evaluaciones a realizar por plan: ", sys.argv[1]
         print u'El plan elegido es: ', plan_elegido
         print u'El porcentaje de descarte es: ', porcentajeDescarte
+        print u'La cantidad de mutaciones es: ', mutacion
     except:
         numero_pruebas = 10
         plan_elegido = PLANARRAY[0]
         porcentajeDescarte = 30
+        mutacion = 5
         print u"El número de pruebas a realizar será el por defecto (10 rondas)"
         print u'El plan elegido es: ', plan_elegido
         print u'El porcentaje de descarte es: ', porcentajeDescarte
+        print u'La cantidad de mutaciones es: ', mutacion
     gw = JavaGateway()  # New gateway connection
     bridge = gw.entry_point  # The actual NetLogoBridge object
     bridge.openModel(NETLOGOMODEL)
+    poblacion = 100
+    Xfile = open('resultados.csv',"w")
+    writer = csv.writer(Xfile,dialect='excel')
+    writer.writerow(["Iteracion/Individuo"]+range(0,poblacion))
 
     createPlanFile(plan_elegido)
     posiciones = obtenerPosiciones(PLANFILE)
@@ -405,7 +441,7 @@ if __name__ == "__main__":
     genes = obtenerGenes(posiciones)
     # generarArchivo(genes)
 
-    individuos = generarPoblacion(genes, 200)
+    individuos = generarPoblacion(genes,poblacion)
 
     # aca especificamos el numero de generaciones
     for x in range(0, numero_pruebas):
@@ -416,13 +452,18 @@ if __name__ == "__main__":
             individuo.evaluar(bridge)
 
         individuos = ordenarIndividuos(individuos)
+        superFitness = [x]
+        for x in individuos:
+            superFitness.append(x.fitness)
+        writer.writerow(superFitness)
         cruzeIndividuos(individuos,posiciones,bridge)
         mejor = individuos[0]
         print "mejor     : {0}".format(mejor.fitness)
         descarteIndividuos(individuos,porcentajeDescarte,genes)
+        Xmen(individuos,posiciones,mutacion)
 
         #individuos = reproducirIndividuos(individuos,bridge)
 
         #individuos = mutarIndividuos(individuos, genes, bridge)
-
+    Xfile.close()
     generarDoors(mejor.genes, plan_elegido)
