@@ -59,7 +59,7 @@ class Individuo():
         fitnessList = []
         # Con esta funcion se realizan 30 pruebas distintas por individuo, se almacenan
         # los resultados y se obtiene un promedio que corresponde a la evaluacion del individuo
-        for i in range(0,30):
+        for i in range(0,5):
             bridge.command("load-fixed-plan-file")
             bridge.command("load-fixed-door-file")
             bridge.command("generate-population")
@@ -70,7 +70,6 @@ class Individuo():
         for x in self.fitnessList:
             self.suman = self.suman + x
         self.fitness = self.suman/len(self.fitnessList)
-        print self.fitnessList
         #bridge.command("repeat 200 [ go ]")
         #new_fitness = bridge.report("ticks")
         #if (self.fitness == 0):
@@ -186,105 +185,137 @@ def ordenarIndividuos(individuos):
     return individuos
 
 
-def seleccionarIndividuos(individuos):
+#def seleccionarIndividuos(individuos):
     # Aca hay que seleccionar el metodo de seleccion de los individuos
     # Seleccionar los n mejores individuos que pasaran al crossover.
-    individuos = ordenarIndividuos(individuos)
-    seleccionados = []
+    #individuos = ordenarIndividuos(individuos)
+    #seleccionados = []
     # Seleccionamos siempre al mejor de cada generacion
-    seleccionados.append(individuos[0])
+    #seleccionados.append(individuos[0])
 
-    weights = [0.5, 0.25, 0.15, 0.1]
+    #weights = [0.5, 0.25, 0.15, 0.1]
 
     #se seleccionan aleatoriamente 30 individuos de forma uniforme
-    for x in range(1, 30):
-        sigue = True
-        while sigue:
-            choices = [random.randrange(1, 50), random.randrange(
-                51, 75), random.randrange(76, 90), random.randrange(90, 100)]
-            rnd = np.random.choice(choices, p=weights)
-            seleccionado = individuos[rnd]
-            if seleccionado in seleccionados:
-                sigue = True
-            else:
-                seleccionados.append(individuos[rnd])
-                sigue = False
-    seleccionados = ordenarIndividuos(seleccionados)
-    return seleccionados
+    #for x in range(1, 30):
+    #    sigue = True
+    #    while sigue:
+    #        choices = [random.randrange(1, 50), random.randrange(
+    #            51, 75), random.randrange(76, 90), random.randrange(90, 100)]
+    #        rnd = np.random.choice(choices, p=weights)
+    #        seleccionado = individuos[rnd]
+    #        if seleccionado in seleccionados:
+    #            sigue = True
+    #        else:
+    #            seleccionados.append(individuos[rnd])
+    #            sigue = False
+    #seleccionados = ordenarIndividuos(seleccionados)
+    #return seleccionados
 
 
-def cruzar(padre, madre):
-    # Cruzamos dos individuos se cruzan individuos en los que no se repiten sus genes al
-    #hacer el cruce
+#def cruzar(padre, madre):
+#    # Cruzamos dos individuos se cruzan individuos en los que no se repiten sus genes al
+#    #hacer el cruce
 
-    continua = True
-    
-    pos = random.randrange(0, 5)  # randrange (0, n-1)
-    if pos == 0:
-        pos = 2
-    else:
-        pos = 2 * pos
+#    continua = True
+#    
+#    pos = random.randrange(0, 5)  # randrange (0, n-1)
+#    if pos == 0:
+#        pos = 2
+#    else:
+#        pos = 2 * pos
 
-    genes_hijo1 = []
-    for x in range(0, pos):
-        genes_hijo1.append(padre.genes[x])
+#    genes_hijo1 = []
+#    for x in range(0, pos):
+#        genes_hijo1.append(padre.genes[x])
 
-    for x in range(pos, 10):
-        genes_hijo1.append(madre.genes[x])
+#    for x in range(pos, 10):
+#        genes_hijo1.append(madre.genes[x])
 
-    genes_hijo2 = []
-    for x in range(0, pos):
-        genes_hijo2.append(madre.genes[x])
+#    genes_hijo2 = []
+#    for x in range(0, pos):
+#        genes_hijo2.append(madre.genes[x])
+#
+#    for x in range(pos, 10):
+#        genes_hijo2.append(padre.genes[x])
+#    #buscando duplicados
+#    duplicados1 = False
+#    duplicados2 = False
 
-    for x in range(pos, 10):
-        genes_hijo2.append(padre.genes[x])
-    #buscando duplicados
-    duplicados1 = False
-    duplicados2 = False
-
-    for i in range(0,5):
-        for j in range(0,5):
-            if i != j:
-                if [genes_hijo1[(i*2)],genes_hijo1[(i*2)+1]] == [genes_hijo1[(j*2)],genes_hijo1[(j*2)+1]]:
-                    duplicados1 = True
-                if [genes_hijo2[(i*2)],genes_hijo2[(i*2)+1]] == [genes_hijo2[(j*2)],genes_hijo2[(j*2)+1]]:
-                    duplicados2 = True
-    hijos = []
-    if not duplicados1 and not duplicados2:
-        hijo1 = Individuo(genes_hijo1)
-        hijos.append(hijo1)
-        hijo2 = Individuo(genes_hijo2)
-        hijos.append(hijo2)
-    return hijos
+#    for i in range(0,5):
+#        for j in range(0,5):
+#            if i != j:
+#                if [genes_hijo1[(i*2)],genes_hijo1[(i*2)+1]] == [genes_hijo1[(j*2)],genes_hijo1[(j*2)+1]]:
+#                    duplicados1 = True
+#                if [genes_hijo2[(i*2)],genes_hijo2[(i*2)+1]] == [genes_hijo2[(j*2)],genes_hijo2[(j*2)+1]]:
+#                    duplicados2 = True
+#    hijos = []
+#    if not duplicados1 and not duplicados2:
+#        hijo1 = Individuo(genes_hijo1)
+#        hijos.append(hijo1)
+#        hijo2 = Individuo(genes_hijo2)
+#        hijos.append(hijo2)
+#    return hijos
 
 
-def reproducirIndividuos(individuos, bridge):
+#def reproducirIndividuos(individuos, bridge):
     # Hay un 75% de probabilidades que un individuo no se reproduzca
-    nueva_poblacion = individuos
-    choices = ["RP", "NP"]
-    weights = [0.40, 0.60]
-    n_individuos = len(nueva_poblacion)
+#    nueva_poblacion = individuos
+#    choices = ["RP", "NP"]
+#    weights = [0.40, 0.60]
+#    n_individuos = len(nueva_poblacion)
+#
+#    while n_individuos < 99:
+#
+#        rnd = np.random.choice(choices, p=weights)
+#        # tomamos un padre y madre aleatorio
+#        padre = individuos[random.randrange(0, len(individuos) - 1)]
+#        madre = individuos[random.randrange(0, len(individuos) - 1)]
+#
+#        if rnd == "RP":
+#            hijos = cruzar(padre, madre)
+#            if hijos != []:
+#                hijos[0].evaluar(bridge)
+#                hijos[1].evaluar(bridge)
+#                nueva_poblacion.append(hijos[0])
+#                nueva_poblacion.append(hijos[1])
+#                n_individuos = n_individuos + 2
+#        else:
+#            pass
+#
+#    nueva_poblacion = ordenarIndividuos(nueva_poblacion)
+#    return nueva_poblacion
 
-    while n_individuos < 99:
+def cruzeIndividuos(individuos, posiciones, bridge):
+    testX = [0,2,4,6,8]
+    testY = [1,3,5,7,9]
+    alpha = individuos[0]
+    for beta in range(1,len(individuos)):
+        for q in testX:
+            for w in testX:
+                if alpha.genes[q]==individuos[beta].genes[w]:
+                    temp = (individuos[beta].genes[w+1]+ alpha.genes[q+1])/2
+                    for x in posiciones:
+                        if alpha.genes[q]==x.x and int(round(temp)) == x.y:
+                            asdufee = x
+                            if asdufee.tipo ==64:
+                                #print "individuo beta ", individuos[beta].genes[w] , individuos[beta].genes[w+1] ,"individuo alpha ", alpha.genes[q] , alpha.genes[q+1]
+                                individuos[beta].genes[w+1] = int(round(temp))
+                                #print "individuo beta ", individuos[beta].genes[w] , individuos[beta].genes[w+1] ,"individuo alpha ", alpha.genes[q] , alpha.genes[q+1]
+        for q in testY:
+            for w in testY:
+                if alpha.genes[q]==individuos[beta].genes[w]:
+                    temp = (individuos[beta].genes[w-1]+ alpha.genes[q-1])/2
+                    for x in posiciones:
+                        if alpha.genes[q]==x.x and int(round(temp)) == x.y:
+                            asdufee = x
+                            if asdufee.tipo ==64:
+                                #print "individuo beta ", individuos[beta].genes[w] , individuos[beta].genes[w-1] ,"individuo alpha ", alpha.genes[q] , alpha.genes[q-1]
+                                individuos[beta].genes[w-1] = int(round(temp))
+                                #print "individuo beta ", individuos[beta].genes[w] , individuos[beta].genes[w-1] ,"individuo alpha ", alpha.genes[q] , alpha.genes[q-1]
+        
 
-        rnd = np.random.choice(choices, p=weights)
-        # tomamos un padre y madre aleatorio
-        padre = individuos[random.randrange(0, len(individuos) - 1)]
-        madre = individuos[random.randrange(0, len(individuos) - 1)]
 
-        if rnd == "RP":
-            hijos = cruzar(padre, madre)
-            if hijos != []:
-                hijos[0].evaluar(bridge)
-                hijos[1].evaluar(bridge)
-                nueva_poblacion.append(hijos[0])
-                nueva_poblacion.append(hijos[1])
-                n_individuos = n_individuos + 2
-        else:
-            pass
 
-    nueva_poblacion = ordenarIndividuos(nueva_poblacion)
-    return nueva_poblacion
 
 
 def mutarIndividuos(individuos, genes, bridge):
@@ -358,7 +389,7 @@ if __name__ == "__main__":
     genes = obtenerGenes(posiciones)
     # generarArchivo(genes)
 
-    individuos = generarPoblacion(genes, 100)
+    individuos = generarPoblacion(genes, 10)
 
     # aca especificamos el numero de generaciones
     for x in range(0, numero_pruebas):
@@ -368,12 +399,13 @@ if __name__ == "__main__":
             # individuos para determinar el fitness de cada uno
             individuo.evaluar(bridge)
 
-        individuos = seleccionarIndividuos(individuos)
+        individuos = ordenarIndividuos(individuos)
+        cruzeIndividuos(individuos,posiciones,bridge)
         mejor = individuos[0]
         print "mejor     : {0}".format(mejor.fitness)
 
-        individuos = reproducirIndividuos(individuos,bridge)
+        #individuos = reproducirIndividuos(individuos,bridge)
 
-        individuos = mutarIndividuos(individuos, genes, bridge)
+        #individuos = mutarIndividuos(individuos, genes, bridge)
 
     generarDoors(mejor.genes, plan_elegido)
