@@ -3,6 +3,7 @@
 import random
 import sys
 import numpy as np
+import statistics as stats
 from py4j.java_gateway import JavaGateway
 from config import DOORS, \
                     SOLUTIONS, \
@@ -63,7 +64,7 @@ class Individuo():
             bridge.command("load-fixed-plan-file")
             bridge.command("load-fixed-door-file")
             bridge.command("generate-population")
-            bridge.command("repeat 150 [ go ]")
+            bridge.command("repeat 250 [ go ]")
             new_fitness = bridge.report("ticks")
             self.fitnessList.append(new_fitness)
         self.suman = 0
@@ -152,6 +153,7 @@ def generarPoblacion(genes, poblacion):
         individuo = Individuo(genes_individuo)
         individuos.append(individuo)
     return individuos
+
 
 
 def asignarGenes(genes):
@@ -289,6 +291,9 @@ def cruzeIndividuos(individuos, posiciones, bridge):
     testX = [0,2,4,6,8]
     testY = [1,3,5,7,9]
     alpha = individuos[0]
+    print "alpha ", alpha.genes , alpha.fitness
+    print "beta ", individuos[1].genes, individuos[1].fitness
+    print "gamma ", individuos[2].genes, individuos[2].fitness
     for beta in range(1,len(individuos)):
         for q in testX:
             for w in testX:
@@ -312,10 +317,17 @@ def cruzeIndividuos(individuos, posiciones, bridge):
                                 #print "individuo beta ", individuos[beta].genes[w] , individuos[beta].genes[w-1] ,"individuo alpha ", alpha.genes[q] , alpha.genes[q-1]
                                 individuos[beta].genes[w-1] = int(round(temp))
                                 #print "individuo beta ", individuos[beta].genes[w] , individuos[beta].genes[w-1] ,"individuo alpha ", alpha.genes[q] , alpha.genes[q-1]
-        
 
-
-
+def descarteIndividuos (individuos, porcentaje, genes):
+    listaSize = len(individuos)
+    descarte = int(round(listaSize*30/100))
+    individuos = individuos[:-descarte or NONE]
+    print len(individuos)
+    for x in range(0,descarte):
+        genes_individuo = asignarGenes(genes)
+        individuo = Individuo(genes_individuo)
+        individuos.append(individuo)
+    print len(individuos)
 
 
 def mutarIndividuos(individuos, genes, bridge):
@@ -372,13 +384,17 @@ if __name__ == "__main__":
     try:
         numero_pruebas = int(sys.argv[1])
         plan_elegido = PLANARRAY[int(sys.argv[2])]
+        porcentajeDescarte = int(sys.argv[3])
         print u"Total de evaluaciones a realizar por plan: ", sys.argv[1]
         print u'El plan elegido es: ', plan_elegido
+        print u'El porcentaje de descarte es: ', porcentajeDescarte
     except:
         numero_pruebas = 10
         plan_elegido = PLANARRAY[0]
+        porcentajeDescarte = 30
         print u"El número de pruebas a realizar será el por defecto (10 rondas)"
         print u'El plan elegido es: ', plan_elegido
+        print u'El porcentaje de descarte es: ', porcentajeDescarte
     gw = JavaGateway()  # New gateway connection
     bridge = gw.entry_point  # The actual NetLogoBridge object
     bridge.openModel(NETLOGOMODEL)
@@ -389,7 +405,7 @@ if __name__ == "__main__":
     genes = obtenerGenes(posiciones)
     # generarArchivo(genes)
 
-    individuos = generarPoblacion(genes, 10)
+    individuos = generarPoblacion(genes, 200)
 
     # aca especificamos el numero de generaciones
     for x in range(0, numero_pruebas):
@@ -403,6 +419,7 @@ if __name__ == "__main__":
         cruzeIndividuos(individuos,posiciones,bridge)
         mejor = individuos[0]
         print "mejor     : {0}".format(mejor.fitness)
+        descarteIndividuos(individuos,porcentajeDescarte,genes)
 
         #individuos = reproducirIndividuos(individuos,bridge)
 
