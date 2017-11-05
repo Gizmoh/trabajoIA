@@ -42,6 +42,8 @@ class Individuo():
     def __init__(self, genes):
         self.fitness = 0
         self.genes = []
+        self.fitnessList = []
+        self.suman = 0
         # almacenamos los genes en una lista simple de numeros
         for g in range(0, 10):
             self.genes.append(genes[g])
@@ -54,20 +56,32 @@ class Individuo():
         # donde el fitness esta dado por el valor de ticks de la simulacion
 
         generarDoors(self.genes)
-        bridge.command("load-fixed-plan-file")
-        bridge.command("load-fixed-door-file")
-        bridge.command("generate-population")
-        bridge.command("repeat 200 [ go ]")
-        new_fitness = bridge.report("ticks")
-        if (self.fitness == 0):
-            
-            self.fitness = new_fitness
+        fitnessList = []
+        # Con esta funcion se realizan 30 pruebas distintas por individuo, se almacenan
+        # los resultados y se obtiene un promedio que corresponde a la evaluacion del individuo
+        for i in range(0,30):
+            bridge.command("load-fixed-plan-file")
+            bridge.command("load-fixed-door-file")
+            bridge.command("generate-population")
+            bridge.command("repeat 150 [ go ]")
+            new_fitness = bridge.report("ticks")
+            self.fitnessList.append(new_fitness)
+        self.suman = 0
+        for x in self.fitnessList:
+            self.suman = self.suman + x
+        self.fitness = self.suman/len(self.fitnessList)
+        print self.fitnessList
+        #bridge.command("repeat 200 [ go ]")
+        #new_fitness = bridge.report("ticks")
+        #if (self.fitness == 0):
+        #    
+        #    self.fitness = new_fitness
 
-        elif(self.fitness > new_fitness):
+        #elif(self.fitness > new_fitness):
 
-            self.fitness = new_fitness
-        else:
-            self.fitness = self.fitness
+        #    self.fitness = new_fitness
+        #else:
+        #    self.fitness = self.fitness
 
 
 def obtenerPosiciones(file):
